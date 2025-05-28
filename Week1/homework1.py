@@ -1,7 +1,7 @@
 from binary_search import binary_search
 
 """
-Given a string, returns all the anagrams from the dictionary    
+Given a string, return all the anagrams from the dictionary    
 """
 
 test_cases = "testcases_hw1.txt"
