@@ -21,16 +21,6 @@ def find_anagrams(random_strings, dictionary):
     for word in dictionary:
         new_dict.append([''.join(sorted(word)), word]) 
     new_dict.sort()
-    
-    '''
-    full_list = []
-    for i in range(len(strings)):
-        anagram = []
-        for j in range(len(new_dict)):
-            if strings[i] == new_dict[j][0]:
-                anagram.append(new_dict[j][1])
-        full_list.append(anagram)
-    '''    
         
     full_list = []
     for i in range(len(strings)):
