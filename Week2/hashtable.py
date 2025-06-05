@@ -19,7 +19,7 @@ def calculate_hash(key):
     # Note: This is not a good hash function. Make it better!
     hash = 0
     for i in key:
-        hash += ord(i)
+        hash = hash * 50 + ord(i)
     return hash
 
 
@@ -113,23 +113,23 @@ class HashTable:
         prev = None
         
         while item:
-            if item.key == key:
-                if prev is None:
-                    self.buckets[bucket_index] = item.next
-                else:
-                    prev.next = item.next
-                
-                self.item_count -= 1
-                
-                if self.bucket_size > 97 and self.item_count < self.bucket_size * 0.3:
-                    self.resize(97)
-                
-                return True    
+            if item.key != key:
+                prev = item
+                item = item.next
+                continue
+            if prev is None:    
+                self.buckets[bucket_index] = item.next
+            else:
+                prev.next = item.next
             
-            prev = item
-            item = item.next
+            self.item_count -= 1
             
-        return(False) 
+            if self.item_count < self.bucket_size * 0.3:
+                self.resize(self.bucket_size // 2)
+            
+            return True    
+        
+        return False 
     
     # Return the total number of items in the hash table.
     def size(self):
