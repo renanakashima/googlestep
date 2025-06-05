@@ -4,7 +4,8 @@ The complexity of searching / adding / removing an element is mostly O(1) with a
 - Knowing the right table size 
 - Cost of re-hashing
 - The worst case of hash table is O(N): trees guarantee O(logN)
+- Trees enable searching for nearby objects as well (aware of relations)
 
 Question 3:
-- Linked List
+- Doubly Linked List combined with Hash Tables
 
