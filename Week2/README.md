@@ -7,5 +7,8 @@ The complexity of searching / adding / removing an element is mostly O(1) with a
 - Trees enable searching for nearby objects as well (aware of relations)
 
 Question 3:
+Design a cache that achieves the following operations with mostly O(1)
+When a pair of <URL, Web page> is given, find if the given pair is contained in the cache or not
+If the pair is not found, insert the pair into the cache after evicting the least recently accessed pair
 - Doubly Linked List combined with Hash Tables
 
