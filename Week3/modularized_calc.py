@@ -25,6 +25,13 @@ def read_minus(line, index):
     token = {'type': 'MINUS'}
     return token, index + 1
 
+def read_mul(line, index):
+    token = {'type': 'MUL'}
+    return token, index + 1
+
+def read_div(line, index):
+    token = {'type': 'DIV'}
+    return token, index + 1
 
 def tokenize(line):
     tokens = []
@@ -36,24 +43,85 @@ def tokenize(line):
             (token, index) = read_plus(line, index)
         elif line[index] == '-':
             (token, index) = read_minus(line, index)
+        elif line[index] == '*':
+            (token, index) = read_mul(line, index)
+        elif line[index] == '/':
+            (token, index) = read_div(line, index)
         else:
             print('Invalid character found: ' + line[index])
             exit(1)
         tokens.append(token)
+    #tokens.insert(0, {'type': None})
+    print(tokens)
     return tokens
 
+"""
++-1.0+2.1-3*4/5
++-3*4*5
++3/4
+"""
 
 def evaluate(tokens):
     answer = 0
+    prod = 0
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
     index = 1
+    index2 = 1
+    while index2 < len(tokens):
+        if tokens[index2]['type'] == 'NUMBER':
+            if tokens[index2 - 1]['type'] == 'MUL':
+                if tokens[index2 - 3]['type'] == 'PLUS':
+                    prod +=  tokens[index2 - 2]['number'] * tokens[index2]['number']
+                    tokens[index2 - 3]['type'] = None
+                    tokens[index2 - 2]['type'] = None
+                    tokens[index2 - 1]['type'] = None
+                    tokens[index2]['type'] = None
+                elif tokens[index2 - 3]['type'] == 'MINUS':
+                    prod -= tokens[index2 - 2]['number'] * tokens[index2]['number']
+                    tokens[index2 - 3]['type'] = None
+                    tokens[index2 - 2]['type'] = None
+                    tokens[index2 - 1]['type'] = None
+                    tokens[index2]['type'] = None
+                else:
+                    prod *= tokens[index2]['number']
+                    tokens[index2 - 1]['type'] = None
+                    tokens[index2]['type'] = None
+            elif tokens[index2 - 1]['type'] == 'DIV':
+                if tokens[index2 - 3]['type'] == 'PLUS':
+                    prod +=  tokens[index2 - 2]['number'] / tokens[index2]['number']
+                    tokens[index2 - 3]['type'] = None
+                    tokens[index2 - 2]['type'] = None
+                    tokens[index2 - 1]['type'] = None
+                    tokens[index2]['type'] = None
+                elif tokens[index2 - 3]['type'] == 'MINUS':
+                    prod -= tokens[index2 - 2]['number'] / tokens[index2]['number']
+                    tokens[index2 - 3]['type'] = None
+                    tokens[index2 - 2]['type'] = None
+                    tokens[index2 - 1]['type'] = None
+                    tokens[index2]['type'] = None
+                else:
+                    prod /= tokens[index2]['number']
+                    tokens[index2 - 1]['type'] = None
+                    tokens[index2]['type'] = None
+        index2 += 1
+    
+    answer += prod 
+    #print(tokens)
+    
     while index < len(tokens):
-        if tokens[index]['type'] == 'NUMBER':
-            if tokens[index - 1]['type'] == 'PLUS':
+        if tokens[index]['type'] == None:
+            index += 1
+            continue
+        elif tokens[index]['type'] == 'NUMBER':
+            if tokens[index - 1]['type'] == None:
+                index += 1
+                continue
+            elif tokens[index - 1]['type'] == 'PLUS':
                 answer += tokens[index]['number']
             elif tokens[index - 1]['type'] == 'MINUS':
                 answer -= tokens[index]['number']
             else:
+                #print(tokens[index])
                 print('Invalid syntax')
                 exit(1)
         index += 1
@@ -75,6 +143,13 @@ def run_test():
     print("==== Test started! ====")
     test("1+2")
     test("1.0+2.1-3")
+    test("1.0+2.1-3*4")
+    test("1.0+2.1-3*4/5")
+    #test("1.0+2.1-3a4/5")
+    #test("")
+    test("1")
+    test("-1*9+2.0")
+    test("(3.0 + 4 * (2 − 1)) / 5")
     print("==== Test finished! ====\n")
 
 run_test()
