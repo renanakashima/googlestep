@@ -15,11 +15,9 @@ def read_number(line, index):
     token = {'type': 'NUMBER', 'number': number}
     return token, index
 
-
 def read_plus(line, index):
     token = {'type': 'PLUS'}
     return token, index + 1
-
 
 def read_minus(line, index):
     token = {'type': 'MINUS'}
@@ -61,11 +59,9 @@ def tokenize(line):
 +3/4
 """
 
-def evaluate(tokens):
-    answer = 0
+def mul_and_div(tokens):
     prod = 0
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
-    index = 1
     index2 = 1
     while index2 < len(tokens):
         if tokens[index2]['type'] == 'NUMBER':
@@ -104,10 +100,10 @@ def evaluate(tokens):
                     tokens[index2 - 1]['type'] = None
                     tokens[index2]['type'] = None
         index2 += 1
-    
-    answer += prod 
-    #print(tokens)
-    
+    return prod
+
+def evaluate(tokens, answer):
+    index = 1
     while index < len(tokens):
         if tokens[index]['type'] == None:
             index += 1
@@ -127,16 +123,14 @@ def evaluate(tokens):
         index += 1
     return answer
 
-
 def test(line):
     tokens = tokenize(line)
-    actual_answer = evaluate(tokens)
+    actual_answer = evaluate(tokens, mul_and_div(tokens))
     expected_answer = eval(line)
     if abs(actual_answer - expected_answer) < 1e-8:
         print("PASS! (%s = %f)" % (line, expected_answer))
     else:
         print("FAIL! (%s should be %f but was %f)" % (line, expected_answer, actual_answer))
-
 
 # Add more tests to this function :)
 def run_test():
@@ -158,5 +152,5 @@ while True:
     print('> ', end="")
     line = input()
     tokens = tokenize(line)
-    answer = evaluate(tokens)
+    answer = evaluate(tokens, mul_and_div(tokens))
     print("answer = %f\n" % answer)
