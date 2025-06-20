@@ -175,3 +175,7 @@ cython_debug/
 
 .DS_Store
 .vscode
+
+# Week4 dataset files (excluding .py files)
+Week4/wikipedia_dataset/*.txt
+

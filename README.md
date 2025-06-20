@@ -3,3 +3,4 @@
   * Week1: Anagrams
   * Week2: Hash Tables
   * Week3: Modularization
+  * Week4: Graph algorithms & PageRank
