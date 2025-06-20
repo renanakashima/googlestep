@@ -94,7 +94,9 @@ class Wikipedia:
             return [self.titles[start_id]]
         
         queue = deque()
+        # a simple list / set (faster) is better
         visited = {}
+        #prev is better
         parent = {}  
         
         visited[start_id] = True
@@ -104,11 +106,13 @@ class Wikipedia:
         while len(queue) != 0:
             node = queue.popleft()
             
+            #this is where we find a goal; therefore we construct a path
             if node == goal_id:
                 path = []
                 current = goal_id
                 while current is not None:
                     path.append(self.titles[current])
+                    #parent points back from the current node to parent node
                     current = parent[current]
                 path.reverse() 
                 return path
@@ -136,11 +140,57 @@ class Wikipedia:
     # ページランクの更新が「完全に」収束するのは時間がかかりすぎるので、更新が十分少なくなったら止める
     # 収束条件の作り方の例：
     # ∑(new_pagerank[i] - old_pagerank[i])^2 < 0.01
+        damping = 0.85
+        tol = 0.01
+        N = len(self.titles)
+        ranks = {pid: 1.0 / N for pid in self.titles}
+        out_deg = {pid: len(self.links[pid]) for pid in self.titles}
+        
+        while True:
+            # 1 0.5   => 0.075 / 3
+            # 2 0.3   => 0.045 / 3
+            # 3 0.2   => 0.03 / 3
+
+            # 1 (0.075 / 3) + (0.045 / 3) + (0.03 / 3)
+            # 2 (0.075 / 3) + (0.045 / 3) + (0.03 / 3)
+            # 3 (0.075 / 3) + (0.045 / 3) + (0.03 / 3)
+
+            # for each ind node, allocate 15% of the rank in every single node
+            # compute_rank = 
+            # for src1 in self.links:
+            #     compute_rank = {pid: new_ranks[pid] + (1.0 - damping) * ranks[src1] / N }
+            # new_ranks = {pid: compute_rank for pid in self.titles}
+
+
+
+            new_ranks = {pid: 0 for pid in self.titles}
+            for src1 in self.links:
+            #for src1 in self.links.keys():
+                compute_rank = new_ranks[pid] + (1.0 - damping) * ranks[src1] / N
+            new_ranks = {pid: compute_rank for pid in self.titles}
+
+            for src, dsts in self.links.items():
+                if out_deg[src] == 0:
+                    contrib = damping * ranks[src] / N
+                    for pid in new_ranks:
+                        new_ranks[pid] += contrib
+                else:
+                    contrib = damping * ranks[src] / out_deg[src]
+                    for dst in dsts:
+                        new_ranks[dst] += contrib
     
+            delta = sum((new_ranks[pid] - ranks[pid])**2 for pid in ranks)
+            ranks = new_ranks
 
-    return
-     
+            if delta < tol:
+                break
+                
+        top10 = sorted(ranks.items(), key=lambda x: x[1], reverse=True)[:10]
+        print("Top 10 pages by PageRank:")
+        for pid, score in top10:
+            print(f"{self.titles[pid]}: {score:.6f}")
 
+        return [(self.titles[pid], score) for pid, score in top10]
 
     # Homework #3 (optional):
     # Search the longest path with heuristics.
@@ -194,6 +244,8 @@ if __name__ == "__main__":
     result3 = wikipedia.find_shortest_path("新宿", "スイス")
     if result2:
         print("Result 3: ", result3)
+    # test case where the goal is not reachable
+    # doesn't go through an infinite loop
     # Homework #2
     wikipedia.find_most_popular_pages()
     # Homework #3 (optional)
